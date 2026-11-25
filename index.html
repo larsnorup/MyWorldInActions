@@ -9,19 +9,24 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,Segoe UI,sans-serif;background:#f4f6f8;color:#1c2430}
 header{background:#0b3d5c;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+header a{color:#fff}
 main{max-width:820px;margin:auto;padding:12px}
+#crumbs{margin:4px 0 10px;font-size:15px;color:#5b6775}#crumbs a{color:#0b3d5c;text-decoration:none;font-weight:600}
+.nav{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:10px;padding:14px 16px;margin:8px 0;text-decoration:none;color:inherit;font-size:17px}
+.nav.strong{background:#e3ecf4;font-weight:600}
+.n{background:#0b3d5c;color:#fff;border-radius:12px;padding:0 10px;font-size:14px;line-height:24px;min-width:28px;text-align:center}
 .tabs button,.btn{border:0;border-radius:8px;padding:8px 12px;margin:2px;background:#e1e7ee;cursor:pointer;font-size:15px}
 .tabs button.on,.btn.pri{background:#0b3d5c;color:#fff}
 select,input,textarea{font-size:16px;padding:8px;border:1px solid #c9d2dc;border-radius:8px;width:100%}
-.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+#q{margin:8px 0}
 .card{background:#fff;border-radius:10px;padding:12px;margin:8px 0;border-left:6px solid #9aa}
 .p1{border-color:#d33}.p2{border-color:#e9a400}.p3{border-color:#6a9}
 .meta{font-size:13px;color:#5b6775;margin-top:4px}.child{margin-left:22px}
+.where{font-size:12px;color:#0b3d5c;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
 .done .t{text-decoration:line-through;color:#889}.late{color:#d33;font-weight:600}
 .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-#form{background:#fff;border-radius:10px;padding:12px;display:none}#form.show{display:grid;gap:8px}
+#form{background:#fff;border-radius:10px;padding:12px;display:none;margin:8px 0}#form.show{display:grid;gap:8px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-header a{color:#fff}
 </style>
 </head>
 <body>
@@ -34,22 +39,25 @@ header a{color:#fff}
  <p id="msg"></p>
 </div>
 <div id="app" style="display:none">
- <div class="tabs">
-  <button data-v="today" class="on">I dag</button><button data-v="all">Alle</button><button data-v="done">Færdige</button>
-  <button class="btn pri" onclick="openForm()">+ Ny</button>
+ <nav id="crumbs"></nav>
+ <div id="lists"></div>
+ <div id="acts">
+  <div class="tabs">
+   <button data-v="today" class="on">I dag</button><button data-v="all">Alle</button><button data-v="done">Færdige</button>
+   <button class="btn pri" onclick="openForm()">+ Ny</button>
+  </div>
+  <input id="q" type="search" placeholder="Søg i actions">
+  <form id="form" onsubmit="save(event)">
+   <input id="title" placeholder="Action" required>
+   <div id="projWrap"><select id="project_id"></select></div>
+   <div class="g2"><input id="concerns" placeholder="Vedrører (person/tema)"><input id="delegated_to" placeholder="Delegeret til"></div>
+   <div class="g2"><select id="priority"><option value="1">Høj</option><option value="2" selected>Mellem</option><option value="3">Lav</option></select><input id="due" type="date"></div>
+   <select id="status"><option value="open">Åben</option><option value="waiting">Venter</option><option value="delegated">Delegeret</option><option value="done">Færdig</option></select>
+   <textarea id="notes" rows="2" placeholder="Noter"></textarea>
+   <div class="row"><button class="btn pri">Gem</button><button type="button" class="btn" onclick="closeForm()">Annullér</button></div>
+  </form>
+  <div id="list"></div>
  </div>
- <div class="filters"><select id="fc"></select><select id="fp"></select></div>
- <form id="form" onsubmit="save(event)">
-  <input id="title" placeholder="Action" required>
-  <div class="g2"><input id="customer" placeholder="Kunde" list="lc"><input id="project" placeholder="Projekt" list="lp"></div>
-  <div class="g2"><input id="concerns" placeholder="Vedrører (person/tema)"><input id="delegated_to" placeholder="Delegeret til"></div>
-  <div class="g2"><select id="priority"><option value="1">Høj</option><option value="2" selected>Mellem</option><option value="3">Lav</option></select><input id="due" type="date"></div>
-  <select id="status"><option value="open">Åben</option><option value="waiting">Venter</option><option value="delegated">Delegeret</option><option value="done">Færdig</option></select>
-  <textarea id="notes" rows="2" placeholder="Noter"></textarea>
-  <div class="row"><button class="btn pri">Gem</button><button type="button" class="btn" onclick="closeForm()">Annullér</button></div>
- </form>
- <datalist id="lc"></datalist><datalist id="lp"></datalist>
- <div id="list"></div>
 </div>
 </main>
 <script type="module">
@@ -57,12 +65,18 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://dvxdbixgjaxoggycbiuy.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_e7bd-WjT0m1iQlH2j5bZ3g_rvGNhllR';
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-let rows = [], view = 'today', editId = null, parentId = null, channel = null;
+
+let C = [], P = [], A = [], view = 'today', editId = null, parentId = null, channel = null;
 const $ = id => document.getElementById(id);
-const F = ['title','customer','project','concerns','delegated_to','priority','due','status','notes'];
+const F = ['title','project_id','concerns','delegated_to','priority','due','status','notes'];
 const ST = {open:'Åben',waiting:'Venter',delegated:'Delegeret',done:'Færdig'};
 const today = () => new Date().toLocaleDateString('sv-SE');
-const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cust = id => C.find(c => c.id === id);
+const proj = id => P.find(p => p.id === id);
+const isOpen = a => a.status !== 'done';
+const projIdsOf = cid => new Set(P.filter(p => p.customer_id === cid).map(p => p.id));
+const route = () => { const h = location.hash.replace(/^#\/?/, '').split('/'); return { k: h[0] || 'home', id: h[1], sub: h[2] }; };
 
 window.login = async () => {
   const { error } = await sb.auth.signInWithOtp({ email: $('email').value, options:{ emailRedirectTo: location.origin + location.pathname } });
@@ -70,65 +84,135 @@ window.login = async () => {
 };
 
 async function load(){
-  const { data, error } = await sb.from('actions').select('*').order('priority').order('due', { nullsFirst:false });
-  if (error) { $('list').innerHTML = `<p>Fejl: ${esc(error.message)}</p>`; return; }
-  rows = data || []; render();
+  const [c, p, a] = await Promise.all([
+    sb.from('customers').select('*').order('name'),
+    sb.from('projects').select('*').order('name'),
+    sb.from('actions').select('*').order('priority').order('due', { nullsFirst:false })
+  ]);
+  const err = c.error || p.error || a.error;
+  if (err) { $('lists').innerHTML = `<p>Fejl: ${esc(err.message)}</p>`; return; }
+  C = c.data; P = p.data; A = a.data; render();
 }
 
-function opts(sel, key, label){
-  const cur = sel.value, vals = [...new Set(rows.map(r => r[key]).filter(Boolean))].sort();
-  sel.innerHTML = `<option value="">${label}</option>` + vals.map(v => `<option>${esc(v)}</option>`).join('');
-  sel.value = cur;
-  $(key === 'customer' ? 'lc' : 'lp').innerHTML = vals.map(v => `<option value="${esc(v)}">`).join('');
+function label(a){
+  const p = proj(a.project_id); if (!p) return 'Uden projekt';
+  const c = cust(p.customer_id); return (c ? c.name + ' · ' : '') + p.name;
 }
+
+function scope(r){
+  if (r.k === 'p') return { acts: A.filter(a => a.project_id === r.id), projs: P.filter(p => p.id === r.id), fixed: r.id };
+  if (r.k === 'c') { const ids = projIdsOf(r.id); return { acts: A.filter(a => ids.has(a.project_id)), projs: P.filter(p => ids.has(p.id)) }; }
+  return { acts: A, projs: P };
+}
+
+function crumbs(r){
+  const parts = [r.k === 'home' ? 'Kunder' : `<a href="#">Kunder</a>`];
+  if (r.k === 'all') parts.push('Alle actions');
+  if (r.k === 'c') {
+    const c = cust(r.id);
+    if (r.sub === 'all') parts.push(`<a href="#c/${r.id}">${esc(c?.name)}</a>`, 'Alle actions');
+    else parts.push(esc(c?.name));
+  }
+  if (r.k === 'p') {
+    const p = proj(r.id), c = p && cust(p.customer_id);
+    if (c) parts.push(`<a href="#c/${c.id}">${esc(c.name)}</a>`);
+    parts.push(esc(p?.name));
+  }
+  $('crumbs').innerHTML = parts.join(' › ');
+}
+
+const nav = (href, name, n, strong) =>
+  `<a class="nav ${strong ? 'strong' : ''}" href="${href}"><span>${esc(name)}</span><span class="n">${n}</span></a>`;
 
 function render(){
-  opts($('fc'),'customer','Alle kunder'); opts($('fp'),'project','Alle projekter');
-  const c = $('fc').value, p = $('fp').value, t = today();
-  let list = rows.filter(r => (!c || r.customer === c) && (!p || r.project === p));
-  if (view === 'done') list = list.filter(r => r.status === 'done');
-  else list = list.filter(r => r.status !== 'done');
-  if (view === 'today') list = list.filter(r => !r.due || r.due <= t || r.priority == 1);
-  const ids = new Set(list.map(r => r.id));
-  const tops = list.filter(r => !r.parent_id || !ids.has(r.parent_id));
-  const card = (r, child) => {
-    const late = r.due && r.due < t && r.status !== 'done';
-    return `<div class="card p${r.priority} ${child?'child':''} ${r.status==='done'?'done':''}">
-      <div class="t"><b>${esc(r.title)}</b></div>
-      <div class="meta">${[r.customer, r.project, r.concerns].filter(Boolean).map(esc).join(' · ')}</div>
-      <div class="meta">${ST[r.status]||''}${r.delegated_to ? ' til ' + esc(r.delegated_to) : ''}${r.due ? ` · <span class="${late?'late':''}">${r.due}</span>` : ''}</div>
-      ${r.notes ? `<div class="meta">${esc(r.notes)}</div>` : ''}
+  const r = route(); crumbs(r);
+  const isList = r.k === 'home' || (r.k === 'c' && r.sub !== 'all');
+  $('lists').style.display = isList ? 'block' : 'none';
+  $('acts').style.display = isList ? 'none' : 'block';
+  if (r.k === 'home') {
+    $('lists').innerHTML =
+      nav('#all', 'Alle actions', A.filter(isOpen).length, true) +
+      C.map(c => { const ids = projIdsOf(c.id); return nav('#c/' + c.id, c.name, A.filter(a => isOpen(a) && ids.has(a.project_id)).length); }).join('') +
+      `<div class="row"><button class="btn" onclick="newCustomer()">+ Ny kunde</button></div>`;
+  } else if (isList) {
+    const c = cust(r.id); if (!c) { location.hash = ''; return; }
+    const ps = P.filter(p => p.customer_id === c.id), ids = new Set(ps.map(p => p.id));
+    $('lists').innerHTML =
+      nav(`#c/${c.id}/all`, `Alle actions for ${c.name}`, A.filter(a => isOpen(a) && ids.has(a.project_id)).length, true) +
+      ps.map(p => nav('#p/' + p.id, p.name, A.filter(a => isOpen(a) && a.project_id === p.id).length)).join('') +
+      `<div class="row"><button class="btn" onclick="newProject('${c.id}')">+ Nyt projekt</button></div>`;
+  } else renderActs(r);
+}
+
+function renderActs(r){
+  const s = scope(r), t = today(), q = $('q').value.trim().toLowerCase();
+  let list = s.acts;
+  if (view === 'done') list = list.filter(a => a.status === 'done');
+  else list = list.filter(isOpen);
+  if (view === 'today') list = list.filter(a => !a.due || a.due <= t || a.priority == 1);
+  if (q) list = list.filter(a => [a.title, a.concerns, a.notes, a.delegated_to, label(a)].join(' ').toLowerCase().includes(q));
+  const ids = new Set(list.map(a => a.id));
+  const tops = list.filter(a => !a.parent_id || !ids.has(a.parent_id));
+  const showWhere = !s.fixed;
+  const card = (a, child) => {
+    const late = a.due && a.due < t && isOpen(a);
+    return `<div class="card p${a.priority} ${child ? 'child' : ''} ${a.status === 'done' ? 'done' : ''}">
+      ${showWhere ? `<div class="where">${esc(label(a))}</div>` : ''}
+      <div class="t"><b>${esc(a.title)}</b></div>
+      ${a.concerns ? `<div class="meta">${esc(a.concerns)}</div>` : ''}
+      <div class="meta">${ST[a.status] || ''}${a.delegated_to ? ' til ' + esc(a.delegated_to) : ''}${a.due ? ` · <span class="${late ? 'late' : ''}">${a.due}</span>` : ''}</div>
+      ${a.notes ? `<div class="meta">${esc(a.notes)}</div>` : ''}
       <div class="row">
-        ${r.status!=='done' ? `<button class="btn" onclick="done('${r.id}')">Færdig</button>` : ''}
-        <button class="btn" onclick="followUp('${r.id}')">+ Opfølgning</button>
-        <button class="btn" onclick="edit('${r.id}')">Ret</button>
+        ${isOpen(a) ? `<button class="btn" onclick="done('${a.id}')">Færdig</button>` : ''}
+        <button class="btn" onclick="followUp('${a.id}')">+ Opfølgning</button>
+        <button class="btn" onclick="edit('${a.id}')">Ret</button>
       </div></div>`;
   };
-  $('list').innerHTML = tops.map(r => card(r) + list.filter(x => x.parent_id === r.id).map(x => card(x, true)).join('')).join('')
+  $('list').innerHTML = tops.map(a => card(a) + list.filter(x => x.parent_id === a.id).map(x => card(x, true)).join('')).join('')
     || '<p>Ingen actions her.</p>';
 }
 
-window.openForm = (r = {}) => {
-  F.forEach(f => $(f).value = r[f] ?? (f==='priority' ? 2 : f==='status' ? 'open' : ''));
+window.newCustomer = async () => {
+  const name = prompt('Navn på kunde'); if (!name) return;
+  const { data, error } = await sb.from('customers').insert({ name }).select().single();
+  if (error) return alert(error.message);
+  C.push(data); location.hash = 'c/' + data.id;
+};
+window.newProject = async cid => {
+  const name = prompt('Navn på projekt'); if (!name) return;
+  const { data, error } = await sb.from('projects').insert({ name, customer_id: cid }).select().single();
+  if (error) return alert(error.message);
+  P.push(data); location.hash = 'p/' + data.id;
+};
+
+window.openForm = (a = {}) => {
+  const s = scope(route());
+  if (!s.projs.length) return alert('Opret først en kunde og et projekt.');
+  $('project_id').innerHTML = '<option value="">Vælg projekt</option>' +
+    s.projs.map(p => `<option value="${p.id}">${esc(label({ project_id: p.id }))}</option>`).join('');
+  F.forEach(f => $(f).value = a[f] ?? (f === 'priority' ? 2 : f === 'status' ? 'open' : ''));
+  $('project_id').value = a.project_id || s.fixed || (s.projs.length === 1 ? s.projs[0].id : '');
+  $('projWrap').style.display = s.fixed ? 'none' : 'block';
   $('form').classList.add('show'); $('title').focus();
 };
 window.closeForm = () => { $('form').classList.remove('show'); editId = parentId = null; };
-window.edit = id => { editId = id; parentId = null; openForm(rows.find(r => r.id === id)); };
+window.edit = id => { editId = id; parentId = null; openForm(A.find(a => a.id === id)); };
 window.followUp = id => {
-  const r = rows.find(x => x.id === id); parentId = id; editId = null;
-  openForm({ customer:r.customer, project:r.project, concerns:r.concerns });
+  const a = A.find(x => x.id === id); parentId = id; editId = null;
+  openForm({ project_id: a.project_id, concerns: a.concerns });
 };
 window.done = async id => { await sb.from('actions').update({ status:'done', updated_at:new Date() }).eq('id', id); load(); };
 
 window.save = async e => {
   e.preventDefault();
   const v = {}; F.forEach(f => v[f] = $(f).value || null);
+  if (!v.project_id) return alert('Vælg et projekt.');
   v.priority = +v.priority || 2;
   if (v.delegated_to && v.status === 'open') v.status = 'delegated';
   const res = editId
     ? await sb.from('actions').update({ ...v, updated_at:new Date() }).eq('id', editId)
     : await sb.from('actions').insert({ ...v, parent_id: parentId });
-  if (res.error) { alert('Kunne ikke gemme: ' + res.error.message); return; }
+  if (res.error) return alert('Kunne ikke gemme: ' + res.error.message);
   closeForm(); load();
 };
 
@@ -136,7 +220,8 @@ document.querySelectorAll('.tabs [data-v]').forEach(b => b.onclick = () => {
   document.querySelectorAll('.tabs [data-v]').forEach(x => x.classList.remove('on'));
   b.classList.add('on'); view = b.dataset.v; render();
 });
-$('fc').onchange = render; $('fp').onchange = render;
+$('q').oninput = render;
+window.addEventListener('hashchange', () => { closeForm(); $('q').value = ''; render(); });
 window.logout = () => sb.auth.signOut();
 
 sb.auth.onAuthStateChange((_, s) => {
@@ -145,7 +230,11 @@ sb.auth.onAuthStateChange((_, s) => {
   $('who').innerHTML = s ? `<a href="#" onclick="logout();return false">Log ud</a>` : '';
   if (s) {
     load();
-    if (!channel) channel = sb.channel('a').on('postgres_changes', { event:'*', schema:'public', table:'actions' }, load).subscribe();
+    if (!channel) channel = sb.channel('db')
+      .on('postgres_changes', { event:'*', schema:'public', table:'actions' }, load)
+      .on('postgres_changes', { event:'*', schema:'public', table:'projects' }, load)
+      .on('postgres_changes', { event:'*', schema:'public', table:'customers' }, load)
+      .subscribe();
   }
 });
 </script>
