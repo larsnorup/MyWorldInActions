@@ -15,18 +15,58 @@ main{max-width:820px;margin:auto;padding:12px}
 .nav{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:10px;padding:14px 16px;margin:8px 0;text-decoration:none;color:inherit;font-size:17px}
 .nav.strong{background:#e3ecf4;font-weight:600}
 .n{background:#0b3d5c;color:#fff;border-radius:12px;padding:0 10px;font-size:14px;line-height:24px;min-width:28px;text-align:center}
-.tabs button,.btn{border:0;border-radius:8px;padding:8px 12px;margin:2px;background:#e1e7ee;cursor:pointer;font-size:15px}
+.tabs button,.btn{border:0;border-radius:8px;padding:8px 12px;margin:2px;background:#e1e7ee;cursor:pointer;font-size:15px;color:#1c2430}
 .tabs button.on,.btn.pri{background:#0b3d5c;color:#fff}
-select,input,textarea{font-size:16px;padding:8px;border:1px solid #c9d2dc;border-radius:8px;width:100%}
+.btn.mtg{background:#5b3a8c;color:#fff}
+select,input,textarea{font-size:16px;padding:8px;border:1px solid #c9d2dc;border-radius:8px;width:100%;font-family:inherit}
 #q{margin:8px 0}
+.sec{margin:18px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:#5b6775}
+.sec.m{color:#5b3a8c}
+.empty{color:#8a94a0;font-size:14px;margin:6px 0}
 .card{background:#fff;border-radius:10px;padding:12px;margin:8px 0;border-left:6px solid #9aa}
 .p1{border-color:#d33}.p2{border-color:#e9a400}.p3{border-color:#6a9}
-.meta{font-size:13px;color:#5b6775;margin-top:4px}.child{margin-left:22px}
+.card.meeting{background:#f6f2fc;border-color:#5b3a8c}
+.meta{font-size:13px;color:#5b6775;margin-top:4px}
 .where{font-size:12px;color:#0b3d5c;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.meeting .where{color:#5b3a8c}
+.when{font-size:14px;font-weight:600;color:#5b3a8c;margin-top:2px}
+.tag{display:inline-block;font-size:12px;border-radius:10px;padding:1px 8px;margin-left:6px;font-weight:600}
+.tag.yes{background:#dff3e6;color:#1e7a3c}.tag.no{background:#fdebd6;color:#a65a00}
 .done .t{text-decoration:line-through;color:#889}.late{color:#d33;font-weight:600}
 .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.items{margin:8px 0 0;padding-left:0;list-style:none}
+.items li{margin:3px 0}
+.items label{display:flex;gap:8px;align-items:flex-start;font-size:15px;cursor:pointer}
+.items input{width:18px;height:18px;margin:1px 0 0;flex:none}
+.items .num{color:#5b3a8c;font-weight:600;min-width:18px}
+.items .x{text-decoration:line-through;color:#8a94a0}
 #form{background:#fff;border-radius:10px;padding:12px;display:none;margin:8px 0}#form.show{display:grid;gap:8px}
+#form.meeting{background:#f6f2fc}
+#formHead{font-weight:600}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lbl{font-size:13px;color:#5b6775;margin-top:4px}
+.it{display:grid;grid-template-columns:22px 1fr 38px 38px 38px;gap:4px;align-items:center}
+.it input[type=checkbox]{width:20px;height:20px}
+.mini{border:0;border-radius:6px;background:#e1e7ee;font-size:16px;height:38px;cursor:pointer}
+.add{display:grid;grid-template-columns:1fr auto;gap:6px}
+.btn.per{background:#2f7d5b;color:#fff}
+.card.trash{border-color:#b9c0c8;background:#fafbfc}
+.trashlink{margin-top:22px;background:#eef1f4;color:#5b6775;font-size:15px}
+.n.gray{background:#8a94a0}
+.card.person{background:#f0f7f3;border-color:#2f7d5b}
+.person .where{color:#2f7d5b;margin-top:10px}
+.cnt{font-size:13px;color:#2f7d5b;font-weight:600;margin-left:6px}
+.pli{display:flex;align-items:center;gap:6px}.pli label{flex:1}
+.ctl{display:flex;gap:3px}.mini.s{height:30px;width:30px;font-size:14px;padding:0}
+#form.person .no-person,#form.person .only-action{display:none}
+.seg button[data-s=people].on{color:#2f7d5b}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);background:#e1e7ee;border-radius:10px;padding:3px;margin-bottom:8px}
+.seg button{border:0;background:none;border-radius:8px;padding:10px 0;font-size:15px;font-weight:600;color:#5b6775;cursor:pointer}
+.seg button.on{background:#fff;color:#0b3d5c;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg button[data-s=meetings].on{color:#5b3a8c}
+.only-meeting{display:none}
+#form.meeting .only-meeting{display:grid}
+#form.meeting .only-action{display:none}
 </style>
 </head>
 <body>
@@ -42,19 +82,34 @@ select,input,textarea{font-size:16px;padding:8px;border:1px solid #c9d2dc;border
  <nav id="crumbs"></nav>
  <div id="lists"></div>
  <div id="acts">
+  <div class="seg">
+   <button data-s="all" class="on">Alt</button><button data-s="actions">Actions</button><button data-s="meetings">Møder</button><button data-s="people">Afklar med</button>
+  </div>
   <div class="tabs">
    <button data-v="today" class="on">I dag</button><button data-v="all">Alle</button><button data-v="done">Færdige</button>
-   <button class="btn pri" onclick="openForm()">+ Ny</button>
+   <button class="btn pri" id="addAction" onclick="openForm({}, 'action')">+ Action</button>
+   <button class="btn mtg" id="addMeeting" onclick="openForm({}, 'meeting')">+ Møde</button>
+   <button class="btn per" id="addPerson" onclick="openForm({}, 'person')">+ Person</button>
   </div>
-  <input id="q" type="search" placeholder="Søg i actions">
+  <input id="q" type="search" placeholder="Søg">
   <form id="form" onsubmit="save(event)">
-   <input id="title" placeholder="Action" required>
-   <div id="projWrap"><select id="project_id"></select></div>
-   <div class="g2"><input id="concerns" placeholder="Vedrører (person/tema)"><input id="delegated_to" placeholder="Delegeret til"></div>
-   <div class="g2"><select id="priority"><option value="1">Høj</option><option value="2" selected>Mellem</option><option value="3">Lav</option></select><input id="due" type="date"></div>
-   <select id="status"><option value="open">Åben</option><option value="waiting">Venter</option><option value="delegated">Delegeret</option><option value="done">Færdig</option></select>
+   <div id="formHead"></div>
+   <input id="title" required>
+   <div id="projWrap"><select id="project_id" onchange="fillParents()"></select></div>
+   <div class="only-meeting g2">
+    <input id="meeting_at" type="datetime-local">
+    <select id="invited"><option value="0">Ikke indkaldt</option><option value="1">Indkaldt</option></select>
+   </div>
+   <select id="parent_id" class="only-action"></select>
+   <input id="concerns" class="no-person">
+   <div class="only-action g2"><input id="delegated_to" placeholder="Delegeret til"><select id="priority"><option value="1">Høj</option><option value="2" selected>Mellem</option><option value="3">Lav</option></select></div>
+   <input id="due" type="date" class="only-action">
+   <select id="status" class="no-person"><option value="open">Åben</option><option value="waiting">Venter</option><option value="delegated">Delegeret</option><option value="done">Færdig</option></select>
+   <div class="lbl" id="itemsLbl"></div>
+   <div id="items"></div>
+   <div class="add"><input id="newItem" placeholder="Nyt punkt"><button type="button" class="btn" onclick="itAdd()">Tilføj</button></div>
    <textarea id="notes" rows="2" placeholder="Noter"></textarea>
-   <div class="row"><button class="btn pri">Gem</button><button type="button" class="btn" onclick="closeForm()">Annullér</button></div>
+   <div class="row"><button class="btn pri">Gem</button><button type="button" class="btn" onclick="closeForm()">Annullér</button><button type="button" class="btn" id="delBtn" style="margin-left:auto;color:#b00" onclick="del()">Slet</button></div>
   </form>
   <div id="list"></div>
  </div>
@@ -67,6 +122,7 @@ const SUPABASE_KEY = 'sb_publishable_e7bd-WjT0m1iQlH2j5bZ3g_rvGNhllR';
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let C = [], P = [], A = [], view = 'today', editId = null, parentId = null, channel = null;
+let kind = 'action', items = [], sec = 'all';
 const $ = id => document.getElementById(id);
 const F = ['title','project_id','concerns','delegated_to','priority','due','status','notes'];
 const ST = {open:'Åben',waiting:'Venter',delegated:'Delegeret',done:'Færdig'};
@@ -75,8 +131,17 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const cust = id => C.find(c => c.id === id);
 const proj = id => P.find(p => p.id === id);
 const isOpen = a => a.status !== 'done';
+const isMtg = a => a.kind === 'meeting';
+const isPer = a => a.kind === 'person';
+const counted = a => isOpen(a) && !isPer(a);
+let refocus = null, ALL = [];
+const KIND = { action: 'Action', meeting: 'Møde', person: 'Afklar med' };
+const binCount = () => ALL.filter(x => x.deleted_at).length + A.reduce((n, x) => n + x.binned.length, 0);
 const projIdsOf = cid => new Set(P.filter(p => p.customer_id === cid).map(p => p.id));
 const route = () => { const h = location.hash.replace(/^#\/?/, '').split('/'); return { k: h[0] || 'home', id: h[1], sub: h[2] }; };
+const localDay = iso => iso ? new Date(iso).toLocaleDateString('sv-SE') : null;
+const toLocalInput = iso => { if (!iso) return ''; const d = new Date(iso); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); };
+const fmtWhen = iso => iso ? new Date(iso).toLocaleString('da-DK', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : 'Intet tidspunkt';
 
 window.login = async () => {
   const { error } = await sb.auth.signInWithOtp({ email: $('email').value, options:{ emailRedirectTo: location.origin + location.pathname } });
@@ -90,8 +155,10 @@ async function load(){
     sb.from('actions').select('*').order('priority').order('due', { nullsFirst:false })
   ]);
   const err = c.error || p.error || a.error;
-  if (err) { $('lists').innerHTML = `<p>Fejl: ${esc(err.message)}</p>`; return; }
-  C = c.data; P = p.data; A = a.data; render();
+  if (err) { $('lists').style.display = 'block'; $('lists').innerHTML = `<p>Fejl: ${esc(err.message)}</p>`; return; }
+  C = c.data; P = p.data;
+  ALL = a.data.map(x => ({ ...x, items: Array.isArray(x.items) ? x.items : [], binned: Array.isArray(x.binned) ? x.binned : [] }));
+  A = ALL.filter(x => !x.deleted_at); render();
 }
 
 function label(a){
@@ -107,10 +174,10 @@ function scope(r){
 
 function crumbs(r){
   const parts = [r.k === 'home' ? 'Kunder' : `<a href="#">Kunder</a>`];
-  if (r.k === 'all') parts.push('Alle actions');
+  if (r.k === 'all') parts.push('Alle');
   if (r.k === 'c') {
     const c = cust(r.id);
-    if (r.sub === 'all') parts.push(`<a href="#c/${r.id}">${esc(c?.name)}</a>`, 'Alle actions');
+    if (r.sub === 'all') parts.push(`<a href="#c/${r.id}">${esc(c?.name)}</a>`, 'Alle');
     else parts.push(esc(c?.name));
   }
   if (r.k === 'p') {
@@ -118,6 +185,7 @@ function crumbs(r){
     if (c) parts.push(`<a href="#c/${c.id}">${esc(c.name)}</a>`);
     parts.push(esc(p?.name));
   }
+  if (r.k === 'trash') parts.push('Papirkurv');
   $('crumbs').innerHTML = parts.join(' › ');
 }
 
@@ -126,50 +194,145 @@ const nav = (href, name, n, strong) =>
 
 function render(){
   const r = route(); crumbs(r);
-  const isList = r.k === 'home' || (r.k === 'c' && r.sub !== 'all');
+  const isList = r.k === 'home' || r.k === 'trash' || (r.k === 'c' && r.sub !== 'all');
   $('lists').style.display = isList ? 'block' : 'none';
   $('acts').style.display = isList ? 'none' : 'block';
   if (r.k === 'home') {
     $('lists').innerHTML =
-      nav('#all', 'Alle actions', A.filter(isOpen).length, true) +
-      C.map(c => { const ids = projIdsOf(c.id); return nav('#c/' + c.id, c.name, A.filter(a => isOpen(a) && ids.has(a.project_id)).length); }).join('') +
-      `<div class="row"><button class="btn" onclick="newCustomer()">+ Ny kunde</button></div>`;
+      nav('#all', 'Alle actions og møder', A.filter(counted).length, true) +
+      C.map(c => { const ids = projIdsOf(c.id); return nav('#c/' + c.id, c.name, A.filter(a => counted(a) && ids.has(a.project_id)).length); }).join('') +
+      `<div class="row"><button class="btn" onclick="newCustomer()">+ Ny kunde</button></div>` +
+      `<a class="nav trashlink" href="#trash"><span>🗑 Papirkurv</span><span class="n gray">${binCount()}</span></a>`;
+  } else if (r.k === 'trash') {
+    renderTrash();
   } else if (isList) {
     const c = cust(r.id); if (!c) { location.hash = ''; return; }
     const ps = P.filter(p => p.customer_id === c.id), ids = new Set(ps.map(p => p.id));
     $('lists').innerHTML =
-      nav(`#c/${c.id}/all`, `Alle actions for ${c.name}`, A.filter(a => isOpen(a) && ids.has(a.project_id)).length, true) +
-      ps.map(p => nav('#p/' + p.id, p.name, A.filter(a => isOpen(a) && a.project_id === p.id).length)).join('') +
+      nav(`#c/${c.id}/all`, `Alle for ${c.name}`, A.filter(a => counted(a) && ids.has(a.project_id)).length, true) +
+      ps.map(p => nav('#p/' + p.id, p.name, A.filter(a => counted(a) && a.project_id === p.id).length)).join('') +
       `<div class="row"><button class="btn" onclick="newProject('${c.id}')">+ Nyt projekt</button></div>`;
   } else renderActs(r);
 }
 
+function itemsHtml(a){
+  if (!a.items.length) return '';
+  const tag = isMtg(a) ? 'ol' : 'ul';
+  return `<${tag} class="items">` + a.items.map((it, i) =>
+    `<li class="pli"><label><input type="checkbox" ${it.done ? 'checked' : ''} onchange="tick('${a.id}',${i})">` +
+    (isMtg(a) ? `<span class="num">${i + 1}.</span>` : '') +
+    `<span class="${it.done ? 'x' : ''}">${esc(it.t)}</span></label>` +
+    `<button class="mini s" title="Slet punkt" onclick="pDel('${a.id}',${i})">✕</button></li>`).join('') + `</${tag}>`;
+}
+
+function renderTrash(){
+  const rows = ALL.filter(x => x.deleted_at).sort((x, y) => y.deleted_at.localeCompare(x.deleted_at));
+  const its = A.flatMap(a => a.binned.map((it, i) => ({ a, it, i }))).sort((x, y) => (y.it.del || '').localeCompare(x.it.del || ''));
+  const when = iso => iso ? new Date(iso).toLocaleString('da-DK', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+  $('lists').innerHTML =
+    `<div class="sec">Slettede actions, møder og personer</div>` +
+    (rows.map(x => `<div class="card trash"><div class="where">${KIND[x.kind] || 'Action'} · ${esc(label(x))}</div>
+      <div class="t"><b>${esc(x.title)}</b></div><div class="meta">Slettet ${when(x.deleted_at)}${x.items.length ? ` · ${x.items.length} punkter` : ''}</div>
+      <div class="row"><button class="btn pri" onclick="restore('${x.id}')">Gendan</button><button class="btn" onclick="purge('${x.id}')">Slet permanent</button></div></div>`).join('')
+      || '<p class="empty">Ingen.</p>') +
+    `<div class="sec">Slettede punkter</div>` +
+    (its.map(({ a, it, i }) => `<div class="card trash"><div class="where">${KIND[a.kind] || 'Action'}: ${esc(a.title)} · ${esc(label(a))}</div>
+      <div class="t">${esc(it.t)}</div><div class="meta">Slettet ${when(it.del)}</div>
+      <div class="row"><button class="btn pri" onclick="itemRestore('${a.id}',${i})">Gendan</button><button class="btn" onclick="itemPurge('${a.id}',${i})">Slet permanent</button></div></div>`).join('')
+      || '<p class="empty">Ingen.</p>') +
+    (rows.length || its.length ? `<div class="row" style="margin-top:14px"><button class="btn" style="color:#b00" onclick="emptyTrash()">Tøm papirkurven</button></div>` : '');
+}
+const progress = a => a.items.length ? ` · ${a.items.filter(i => i.done).length}/${a.items.length} punkter` : '';
+
 function renderActs(r){
   const s = scope(r), t = today(), q = $('q').value.trim().toLowerCase();
-  let list = s.acts;
-  if (view === 'done') list = list.filter(a => a.status === 'done');
-  else list = list.filter(isOpen);
-  if (view === 'today') list = list.filter(a => !a.due || a.due <= t || a.priority == 1);
-  if (q) list = list.filter(a => [a.title, a.concerns, a.notes, a.delegated_to, label(a)].join(' ').toLowerCase().includes(q));
-  const ids = new Set(list.map(a => a.id));
-  const tops = list.filter(a => !a.parent_id || !ids.has(a.parent_id));
+  const match = a => !q || [a.title, a.concerns, a.notes, a.delegated_to, label(a), ...a.items.map(i => i.t)].join(' ').toLowerCase().includes(q);
   const showWhere = !s.fixed;
-  const card = (a, child) => {
-    const late = a.due && a.due < t && isOpen(a);
-    return `<div class="card p${a.priority} ${child ? 'child' : ''} ${a.status === 'done' ? 'done' : ''}">
+
+  document.querySelectorAll('.tabs [data-v]').forEach(b => b.style.display = sec === 'people' ? 'none' : '');
+  $('addAction').style.display = sec === 'all' || sec === 'actions' ? '' : 'none';
+  $('addMeeting').style.display = sec === 'all' || sec === 'meetings' ? '' : 'none';
+  $('addPerson').style.display = sec === 'people' ? '' : 'none';
+
+  if (sec === 'people') {
+    const keep = {}; document.querySelectorAll('[id^=pi_]').forEach(x => keep[x.id] = x.value);
+    const focused = document.activeElement?.id;
+    const groups = {};
+    s.acts.filter(a => isPer(a) && match(a)).forEach(a => { const k = a.title.trim().toLowerCase(); (groups[k] ||= []).push(a); });
+    const names = Object.keys(groups).sort((x, y) => x.localeCompare(y, 'da'));
+    const block = r => `
+      ${showWhere ? `<div class="where">${esc(label(r))}</div>` : ''}
+      <ul class="items">${r.items.map((it, i) => `<li class="pli">
+        <label><input type="checkbox" ${it.done ? 'checked' : ''} onchange="tick('${r.id}',${i})"><span class="${it.done ? 'x' : ''}">${esc(it.t)}</span></label>
+        <span class="ctl"><button class="mini s" onclick="pMove('${r.id}',${i},-1)">↑</button><button class="mini s" onclick="pMove('${r.id}',${i},1)">↓</button><button class="mini s" onclick="pDel('${r.id}',${i})">✕</button></span>
+        </li>`).join('')}</ul>
+      <div class="add" style="margin-top:6px"><input id="pi_${r.id}" placeholder="Nyt emne at afklare" onkeydown="if(event.key==='Enter')pAdd('${r.id}')"><button class="btn" onclick="pAdd('${r.id}')">Tilføj</button></div>
+      <div class="row">${r.items.some(i => i.done) ? `<button class="btn" onclick="pClear('${r.id}')">Ryd afklarede</button>` : ''}<button class="btn" onclick="edit('${r.id}')">Ret</button><button class="btn" onclick="trash('${r.id}')">Slet</button></div>`;
+    $('list').innerHTML = names.map(k => {
+      const rows = groups[k], all = rows.flatMap(r => r.items), open = all.filter(i => !i.done).length;
+      return `<div class="card person"><div class="t"><b>${esc(rows[0].title)}</b><span class="cnt">${open} åbne</span></div>${rows.map(block).join('')}</div>`;
+    }).join('') || '<p class="empty">Ingen personer endnu. Tryk + Person.</p>';
+    Object.entries(keep).forEach(([id, v]) => { const el = $(id); if (el) el.value = v; });
+    const f = refocus ? 'pi_' + refocus : focused;
+    if (f && f.startsWith('pi_') && $(f)) $(f).focus();
+    refocus = null;
+    return;
+  }
+
+  let ms =s.acts.filter(a => isMtg(a) && match(a));
+  if (view === 'done') ms = ms.filter(a => !isOpen(a)); else ms = ms.filter(isOpen);
+  if (view === 'today') ms = ms.filter(a => localDay(a.meeting_at) === t);
+  ms.sort((x, y) => (x.meeting_at || '9999').localeCompare(y.meeting_at || '9999') * (view === 'done' ? -1 : 1));
+
+  let list = s.acts.filter(a => !isMtg(a) && !isPer(a) && match(a));
+  if (view === 'done') list = list.filter(a => !isOpen(a)); else list = list.filter(isOpen);
+  if (view === 'today') list = list.filter(a => !a.due || a.due <= t || a.priority == 1);
+
+  const mcard = a => `<div class="card meeting ${isOpen(a) ? '' : 'done'}">
       ${showWhere ? `<div class="where">${esc(label(a))}</div>` : ''}
       <div class="t"><b>${esc(a.title)}</b></div>
+      <div class="when">${fmtWhen(a.meeting_at)}<span class="tag ${a.invited ? 'yes' : 'no'}">${a.invited ? 'Indkaldt' : 'Ikke indkaldt'}</span></div>
       ${a.concerns ? `<div class="meta">${esc(a.concerns)}</div>` : ''}
-      <div class="meta">${ST[a.status] || ''}${a.delegated_to ? ' til ' + esc(a.delegated_to) : ''}${a.due ? ` · <span class="${late ? 'late' : ''}">${a.due}</span>` : ''}</div>
+      ${itemsHtml(a)}
+      ${a.notes ? `<div class="meta">${esc(a.notes)}</div>` : ''}
+      <div class="row">
+        ${isOpen(a) ? `<button class="btn" onclick="done('${a.id}')">Afholdt</button>` : ''}
+        <button class="btn" onclick="followUp('${a.id}')">+ Action</button>
+        <button class="btn" onclick="edit('${a.id}')">Ret</button>
+        <button class="btn" onclick="trash('${a.id}')">Slet</button>
+      </div></div>`;
+
+  const ids = new Set(list.map(a => a.id));
+  const card = (a, depth) => {
+    const late = a.due && a.due < t && isOpen(a);
+    const par = a.parent_id && !ids.has(a.parent_id) ? A.find(x => x.id === a.parent_id) : null;
+    return `<div class="card p${a.priority} ${isOpen(a) ? '' : 'done'}" style="margin-left:${Math.min(depth, 3) * 22}px">
+      ${showWhere ? `<div class="where">${esc(label(a))}</div>` : ''}
+      <div class="t"><b>${esc(a.title)}</b></div>
+      ${par ? `<div class="meta">↳ fra ${isMtg(par) ? 'møde' : 'action'}: ${esc(par.title)}</div>` : ''}
+      ${a.concerns ? `<div class="meta">${esc(a.concerns)}</div>` : ''}
+      <div class="meta">${ST[a.status] || ''}${a.delegated_to ? ' til ' + esc(a.delegated_to) : ''}${a.due ? ` · <span class="${late ? 'late' : ''}">${a.due}</span>` : ''}${progress(a)}</div>
+      ${itemsHtml(a)}
       ${a.notes ? `<div class="meta">${esc(a.notes)}</div>` : ''}
       <div class="row">
         ${isOpen(a) ? `<button class="btn" onclick="done('${a.id}')">Færdig</button>` : ''}
         <button class="btn" onclick="followUp('${a.id}')">+ Opfølgning</button>
         <button class="btn" onclick="edit('${a.id}')">Ret</button>
+        <button class="btn" onclick="trash('${a.id}')">Slet</button>
       </div></div>`;
   };
-  $('list').innerHTML = tops.map(a => card(a) + list.filter(x => x.parent_id === a.id).map(x => card(x, true)).join('')).join('')
-    || '<p>Ingen actions her.</p>';
+  const tree = (a, depth, seen) => {
+    if (seen.has(a.id)) return ''; seen.add(a.id);
+    return card(a, depth) + list.filter(x => x.parent_id === a.id).map(x => tree(x, depth + 1, seen)).join('');
+  };
+  const seen = new Set();
+  const tops = list.filter(a => !a.parent_id || !ids.has(a.parent_id));
+
+  const mHtml = ms.map(mcard).join('') || `<p class="empty">${view === 'today' ? 'Ingen møder i dag.' : 'Ingen møder.'}</p>`;
+  const aHtml = tops.map(a => tree(a, 0, seen)).join('') || '<p class="empty">Ingen actions her.</p>';
+  $('list').innerHTML =
+    (sec !== 'actions' ? (sec === 'all' ? `<div class="sec m">Møder</div>` : '') + mHtml : '') +
+    (sec !== 'meetings' ? (sec === 'all' ? `<div class="sec">Actions</div>` : '') + aHtml : '');
 }
 
 window.newCustomer = async () => {
@@ -185,33 +348,163 @@ window.newProject = async cid => {
   P.push(data); location.hash = 'p/' + data.id;
 };
 
-window.openForm = (a = {}) => {
+// ---- punkter / agendapunkter i formularen ----
+function drawItems(){
+  $('items').innerHTML = items.map((it, i) => `<div class="it">
+    <input type="checkbox" ${it.done ? 'checked' : ''} onchange="itToggle(${i})">
+    <input value="${esc(it.t)}" oninput="itEdit(${i}, this.value)">
+    <button type="button" class="mini" onclick="itMove(${i},-1)" title="Op">↑</button>
+    <button type="button" class="mini" onclick="itMove(${i},1)" title="Ned">↓</button>
+    <button type="button" class="mini" onclick="itDel(${i})" title="Fjern">✕</button></div>`).join('');
+}
+window.itAdd = () => { const v = $('newItem').value.trim(); if (!v) return; items.push({ t: v, done: false }); $('newItem').value = ''; drawItems(); $('newItem').focus(); };
+let formBin = [];
+window.itDel = i => { const [it] = items.splice(i, 1); if (it?.t?.trim()) formBin.push({ ...it, del: new Date().toISOString() }); drawItems(); };
+window.itEdit = (i, v) => { items[i].t = v; };
+window.itToggle = i => { items[i].done = !items[i].done; };
+window.itMove = (i, d) => { const j = i + d; if (j < 0 || j >= items.length) return; [items[i], items[j]] = [items[j], items[i]]; drawItems(); };
+$('newItem').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); itAdd(); } });
+
+async function saveItems(a){
+  render();
+  const { error } = await sb.from('actions').update({ items: a.items, binned: a.binned }).eq('id', a.id);
+  if (error) { alert('Kunne ikke gemme: ' + error.message); load(); }
+}
+const byId = id => A.find(x => x.id === id);
+window.tick = (id, i) => { const a = byId(id); if (!a) return; a.items = a.items.map((it, k) => k === i ? { ...it, done: !it.done } : it); saveItems(a); };
+window.pAdd = id => {
+  const el = $('pi_' + id), v = el.value.trim(); if (!v) return;
+  const a = byId(id); a.items = [...a.items, { t: v, done: false }]; el.value = ''; refocus = id; saveItems(a);
+};
+window.pMove = (id, i, d) => {
+  const a = byId(id), j = i + d; if (j < 0 || j >= a.items.length) return;
+  const it = [...a.items]; [it[i], it[j]] = [it[j], it[i]]; a.items = it; saveItems(a);
+};
+window.pDel = (id, i) => {
+  const a = byId(id), it = a.items[i]; if (!it) return;
+  a.items = a.items.filter((_, k) => k !== i);
+  a.binned = [...a.binned, { ...it, del: new Date().toISOString() }];
+  saveItems(a);
+};
+window.itemRestore = (id, i) => {
+  const a = byId(id), it = a.binned[i]; if (!it) return;
+  const { del: _, ...back } = it;
+  a.binned = a.binned.filter((_, k) => k !== i); a.items = [...a.items, back]; saveItems(a);
+};
+window.itemPurge = (id, i) => {
+  const a = byId(id); if (!confirm('Slet punktet permanent?')) return;
+  a.binned = a.binned.filter((_, k) => k !== i); saveItems(a);
+};
+window.trash = async id => {
+  const a = ALL.find(x => x.id === id); if (!a) return;
+  a.deleted_at = new Date().toISOString(); A = ALL.filter(x => !x.deleted_at);
+  if (editId === id) closeForm();
+  render();
+  const { error } = await sb.from('actions').update({ deleted_at: a.deleted_at }).eq('id', id);
+  if (error) { alert('Kunne ikke slette: ' + error.message); load(); }
+};
+window.restore = async id => {
+  const a = ALL.find(x => x.id === id); if (!a) return;
+  a.deleted_at = null; A = ALL.filter(x => !x.deleted_at); render();
+  const { error } = await sb.from('actions').update({ deleted_at: null }).eq('id', id);
+  if (error) { alert('Kunne ikke gendanne: ' + error.message); load(); }
+};
+window.purge = async id => {
+  if (!confirm('Slet permanent? Det kan ikke fortrydes.')) return;
+  const { error } = await sb.from('actions').delete().eq('id', id);
+  if (error) return alert('Kunne ikke slette: ' + error.message);
+  load();
+};
+window.emptyTrash = async () => {
+  if (!confirm('Tøm papirkurven? Alt i den slettes permanent.')) return;
+  const ids = ALL.filter(x => x.deleted_at).map(x => x.id);
+  const jobs = A.filter(x => x.binned.length).map(x => sb.from('actions').update({ binned: [] }).eq('id', x.id));
+  if (ids.length) jobs.push(sb.from('actions').delete().in('id', ids));
+  const res = await Promise.all(jobs), err = res.find(r => r.error);
+  if (err) alert('Noget kunne ikke slettes: ' + err.error.message);
+  load();
+};
+window.pClear = id => {
+  const a = byId(id), now = new Date().toISOString();
+  a.binned = [...a.binned, ...a.items.filter(x => x.done).map(x => ({ ...x, del: now }))];
+  a.items = a.items.filter(x => !x.done); saveItems(a);
+};
+window.del = () => trash(editId);
+
+window.openForm = (a = {}, k) => {
   const s = scope(route());
   if (!s.projs.length) return alert('Opret først en kunde og et projekt.');
+  kind = a.kind || k || 'action';
+  const m = kind === 'meeting', pe = kind === 'person';
+  $('form').classList.toggle('meeting', m);
+  $('form').classList.toggle('person', pe);
+  $('formHead').textContent = a.id ? (m ? 'Ret møde' : pe ? 'Ret person' : 'Ret action')
+    : (m ? 'Nyt møde' : pe ? 'Ny person at afklare med' : parentId ? 'Ny opfølgning' : 'Ny action');
+  $('title').placeholder = m ? 'Mødenavn' : pe ? 'Navn på person' : 'Action';
+  $('concerns').placeholder = m ? 'Deltagere' : 'Vedrører (person/tema)';
+  $('itemsLbl').textContent = m ? 'Agendapunkter' : pe ? 'Emner at afklare' : 'Punkter';
+  $('delBtn').style.display = a.id ? '' : 'none';
   $('project_id').innerHTML = '<option value="">Vælg projekt</option>' +
     s.projs.map(p => `<option value="${p.id}">${esc(label({ project_id: p.id }))}</option>`).join('');
   F.forEach(f => $(f).value = a[f] ?? (f === 'priority' ? 2 : f === 'status' ? 'open' : ''));
   $('project_id').value = a.project_id || s.fixed || (s.projs.length === 1 ? s.projs[0].id : '');
   $('projWrap').style.display = s.fixed ? 'none' : 'block';
-  $('form').classList.add('show'); $('title').focus();
+  $('meeting_at').value = toLocalInput(a.meeting_at);
+  $('invited').value = a.invited ? '1' : '0';
+  items = (a.items || []).map(x => ({ ...x })); formBin = [];
+  drawItems(); $('newItem').value = '';
+  fillParents(a.parent_id || parentId || '');
+  $('form').classList.add('show');
+  $('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('title').focus();
+};
+
+function descendants(id){
+  const out = new Set([id]); let added = true;
+  while (added) { added = false;
+    A.forEach(x => { if (x.parent_id && out.has(x.parent_id) && !out.has(x.id)) { out.add(x.id); added = true; } });
+  }
+  return out;
+}
+window.fillParents = (keep) => {
+  const cur = keep ?? $('parent_id').value, pid = $('project_id').value;
+  const banned = editId ? descendants(editId) : new Set();
+  const opts = A.filter(x => x.project_id === pid && !isPer(x) && !banned.has(x.id) && (isOpen(x) || x.id === cur));
+  $('parent_id').innerHTML = '<option value="">Opfølgning på: ingen (selvstændig)</option>' +
+    opts.map(x => `<option value="${x.id}">Opfølgning på ${isMtg(x) ? 'møde' : ''}: ${esc(x.title)}</option>`).join('');
+  $('parent_id').value = opts.some(x => x.id === cur) ? cur : '';
 };
 window.closeForm = () => { $('form').classList.remove('show'); editId = parentId = null; };
 window.edit = id => { editId = id; parentId = null; openForm(A.find(a => a.id === id)); };
 window.followUp = id => {
   const a = A.find(x => x.id === id); parentId = id; editId = null;
-  openForm({ project_id: a.project_id, concerns: a.concerns });
+  openForm({ project_id: a.project_id, concerns: isMtg(a) ? '' : a.concerns }, 'action');
 };
 window.done = async id => { await sb.from('actions').update({ status:'done', updated_at:new Date() }).eq('id', id); load(); };
 
 window.save = async e => {
   e.preventDefault();
+  if ($('newItem').value.trim()) itAdd();
   const v = {}; F.forEach(f => v[f] = $(f).value || null);
   if (!v.project_id) return alert('Vælg et projekt.');
-  v.priority = +v.priority || 2;
-  if (v.delegated_to && v.status === 'open') v.status = 'delegated';
+  v.kind = kind;
+  v.items = items.map(i => ({ t: i.t.trim(), done: !!i.done })).filter(i => i.t);
+  v.binned = [...(editId ? byId(editId)?.binned || [] : []), ...formBin];
+  if (kind === 'person') {
+    Object.assign(v, { status: 'open', concerns: null, meeting_at: null, invited: false, parent_id: null, delegated_to: null, due: null, priority: 2 });
+  } else if (kind === 'meeting') {
+    v.meeting_at = $('meeting_at').value ? new Date($('meeting_at').value).toISOString() : null;
+    v.invited = $('invited').value === '1';
+    v.parent_id = null; v.delegated_to = null; v.due = null; v.priority = 2;
+  } else {
+    v.meeting_at = null; v.invited = false;
+    v.parent_id = $('parent_id').value || null;
+    v.priority = +v.priority || 2;
+    if (v.delegated_to && v.status === 'open') v.status = 'delegated';
+  }
   const res = editId
     ? await sb.from('actions').update({ ...v, updated_at:new Date() }).eq('id', editId)
-    : await sb.from('actions').insert({ ...v, parent_id: parentId });
+    : await sb.from('actions').insert(v);
   if (res.error) return alert('Kunne ikke gemme: ' + res.error.message);
   closeForm(); load();
 };
@@ -219,6 +512,10 @@ window.save = async e => {
 document.querySelectorAll('.tabs [data-v]').forEach(b => b.onclick = () => {
   document.querySelectorAll('.tabs [data-v]').forEach(x => x.classList.remove('on'));
   b.classList.add('on'); view = b.dataset.v; render();
+});
+document.querySelectorAll('.seg [data-s]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.seg [data-s]').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); sec = b.dataset.s; closeForm(); render();
 });
 $('q').oninput = render;
 window.addEventListener('hashchange', () => { closeForm(); $('q').value = ''; render(); });
